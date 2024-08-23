@@ -1,0 +1,133 @@
+file_path<- file.choose()
+print(file_path)
+data<- read.table(file_path,header=TRUE)
+data
+weight<-data$weight
+height<- data$height
+gender<- data$gender
+id<- data$id
+
+y<- weight
+x1<- height
+x2<- ifelse(gender == "M", 1, 0)
+x3<-x1*x2
+
+my_model<- lm(y~x1+x2+x3)
+summary(my_model)
+AIC(my_model)
+aov(my_model)
+
+
+# Fit a linear model with interaction term
+model <- lm(weight ~ height * factor(gender), data = data)
+
+# Check the summary of the model
+summary(model)
+AIC(model)
+
+# Plot the data and fitted lines
+plot(height, weight, col = ifelse(gender == "M", "blue", "red"), pch = 16, main = "Adjusted Lines by Gender", xlab = "Height", ylab = "Weight")
+abline(coef(model)["(Intercept)"], coef(model)["height"], col = "blue", lty = 1)
+abline(coef(model)["(Intercept)"] + coef(model)["factor(gender)M"], coef(model)["height"] + coef(model)["height:factor(gender)M"], col = "red", lty = 2)
+legend("topright", legend = c("Female", "Male"), col = c("red", "blue"), pch = 16, title = "Gender")
+
+model_diff_lines <- lm(weight ~ height * factor(gender), data = data)
+
+
+
+# Fit a linear model with parallel lines
+model_parallel_lines <- lm(weight ~ height + height:factor(gender), data = data)
+
+# Check the summary of the model
+summary(model_parallel_lines)
+AIC(model_parallel_lines)
+
+
+plot(data$height, data$weight, col = "blue", pch = 16, main = "Regression Line", xlab = "Height", ylab = "Weight")
+
+# Add regression line
+abline(coef(model_common_line), col = "red", lty = 1)
+
+model_coefs <- coef(model_parallel_lines)
+
+plot(height, weight, col = ifelse(gender == "M", "blue", "red"), pch = 16, main = "Parallel Lines by Gender", xlab = "Height", ylab = "Weight")
+
+plot(height, weight, col = ifelse(gender == "M", "blue", "red"), pch = 16, main = "Same Line by Gender", xlab = "Height", ylab = "Weight")
+abline(model_same_line$coefficients[1], model_same_line$coefficients[2], col = "black", lty = 1)
+legend("topright", legend = c("Female", "Male", "Same Line"), col = c("red", "blue", "black"), pch = c(16, 16, NA), title = "Gender")
+
+model_parallel_lines <- lm(weight ~ height + factor(gender), data = data)
+AIC(model_parallel_lines)
+
+model_diff_lines<- lm(weight ~ height * factor(gender), data = data)
+AIC(model_diff_lines)
+
+model_common_line <- lm(weight ~ height, data = data)
+AIC(model_common_line)
+
+AIC(model_diff_lines, model_parallel_lines, model_common_line)
+
+
+
+plot(data$height, data$weight, col = ifelse(data$gender == "M", "blue", "red"), pch = 16, main = "Regression Lines by Gender", xlab = "Height", ylab = "Weight")
+
+# Add regression lines
+#abline(coef(model_parallel_lines)["(Intercept)"], coef(model_parallel_lines)["height"], col = "blue", lty = 1)
+abline(coef(model_parallel_lines)["(Intercept)"], coef(model_parallel_lines)["weight"], col = "red", lty = 2)
+#abline(coef(model_parallel_lines)["(Intercept)"] )#+ coef(model_parallel_lines)["height:factor(gender)1"], coef(model_parallel_lines)["height"] + coef(model_parallel_lines)["height:factor(gender)"], col = "red", lty = 2)
+
+# Add legend
+legend("topright", legend = c("Female", "Male"), col = c("red", "blue"), pch = 16, title = "Gender")
+
+test<-lm(y~x1+x2*x3)
+summary(test)
+AIC(test)
+
+anova(test, my_model, test="F")
+
+my_model<- lm(y~x1+x2+x3)
+summary(my_model)
+AIC(my_model)
+
+b0<- coef(my_model)[1]
+b1<- coef(my_model)[2]
+b2<- coef(my_model)[3]
+b3<- coef(my_model)[4]
+
+anova_model <- aov(y~ x1+x2+x3, data = data)
+
+# Display ANOVA table
+summary(anova_model)
+
+parallel_model<- lm(y~x1+x2)
+summary(parallel_model)
+AIC(parallel_model)
+aov(parallel_model)
+data
+one_line<- lm(y~x1)
+summary(one_line)
+AIC(one_line)
+aov(one_line)
+# Plot the data and fitted lines
+plot(height, weight, col = ifelse(gender == "M", "blue", "red"), pch = 16, main = "Adjusted Lines by Gender", xlab = "Height", ylab = "Weight")
+abline(coef(model)["(Intercept)"], coef(model)["height"], col = "blue", lty = 1)
+abline(coef(model)["(Intercept)"] + coef(model)["factor(gender)M"], coef(model)["height"] + coef(model)["height:factor(gender)M"], col = "red", lty = 2)
+legend("topright", legend = c("Female", "Male"), col = c("red", "blue"), pch = 16, title = "Gender")
+
+library("rgl") 
+
+y1<-y[x2 ==0]
+y1
+xx1<-x1[x2==0]
+xx1
+xx2<-x1[x2==1]
+xx2
+y2<- y[x1==1]
+
+plot(xx1,y1 , main=expression(paste("Demand vs Years")), xlab="Years",
+ylab="Demand", col="blue",pch=19, xlim=c(0,16), ylim=c(8,20) )
+abline(lm(y1~xx1), col="blue")
+points(xx2,y2,col="red",pch=19)
+abline(lm(y2~xx2), col="red")
+legend("bottomright", c("x1<9", "x1>=9"), col=c("blue","red"), lty=1:2)
+

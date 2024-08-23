@@ -1,0 +1,240 @@
+file_path <- file.choose()
+print(file_path)
+[1] "C:\\Users\\anton\\Desktop\\Στατιστικη_Μοντελοποιηση2\\vehicles.txt"
+
+data<- read.table("C:\\Users\\anton\\Desktop\\Στατιστικη_Μοντελοποιηση2\\vehicles.txt",header=TRUE)
+data
+car<- data$car
+car[1]
+mpg<- data$mpg
+cyl<- data$cyl
+disp<- disp$disp
+hp<- data$hp
+drat<- data$drat
+wt<- data$wt
+qsec<- data$qsec
+vs<- data$vs
+am<- data$am
+gear<- data$gear
+carb<- data$carb
+cor(drat,wt)
+library(car)
+model<- (mpg~cyl+disp+hp+drat+wt+qsec+vs+am+gear+carb)
+summary(model)
+model
+model<- lm(mpg~cyl+hp+drat+wt+qsec+vs+am+gear+carb)
+summary(model)
+vif(model)
+AIC(model)
+reduced_model <- step(model, direction = "backward")
+final_model <- step(model, direction = "forward", scope = formula(lm(mpg~cyl+hp+drat+wt+qsec+vs+am+gear+carb , data = data)))
+final_model
+reduced_model
+c<- glmnet(as.matrix(data[-1]),data[,1],standarize=TRUE,alpha=1)
+install.packages("glmnet")
+library(glmnet)
+sum(is.na(data[,1]))
+all_constant <- length(unique(data[,1])) == 1
+print(all_constant)
+any(!is.numeric(data[,1]))
+data[,1] <- as.numeric(as.character(data[,1]))
+non_numeric_indices <- which(!is.numeric(data[,1]))
+print(non_numeric_indices)
+problem_values <- unique(data[,1][non_numeric_indices])
+print(problem_values)
+any(is.infinite(data[,1]))  # Check for infinite values
+any(abs(data[,1]) > 1e15)
+print(na.omit(data))
+d<-na.omit(data)
+na.omit(d)
+data_no_missing_columns <- data[, colSums(is.na(data)) == 0]
+data_no_missing_columns
+c<- glmnet(as.matrix(data_no_missing_columns[-1]),data_no_missing_columns[,1],standarize=TRUE,alpha=1)
+c
+length(data)
+data
+cv<- cv.glmnet()
+summary(model)
+cor(mpg,cyl)
+correlation_matrix <- cor(data)
+print(correlation_matrix)
+correlation_matrix <- na.omit(correlation_matrix)
+correlation_matrix
+data<- data[,-1]
+data
+correlation_matrix <- cor(data)
+correlation_matrix[,1]
+vif(model)
+my_model<- lm(mpg~cyl+hp+wt+disp)
+hp
+disp<- data$disp
+disp
+my_model<- lm(mpg~cyl+hp+wt+disp) #cor model
+summary(my_model)
+AIC(my_model)
+
+vif_model<- lm(mpg~cyl+hp+wt+gear)
+summary(vif_model)           #(Variance Inflation Factor)
+AIC(vif_model)
+
+no_response_var_model<- lm(mpg~cyl+hp+drat+wt+qsec+vs+am+gear+carb+0)
+summary(no_response_var_model)
+AIC(no_response_var_model)
+
+reduced_model <- step(model, direction = "backward")
+summary(reduced_model)
+AIC(reduced_model)
+
+install.packages("MASS")
+library(MASS)
+forward_selection <- stepAIC(model, direction = "forward", trace = FALSE)
+summary(forward_selection)
+AIC(forward_selection)
+
+
+
+best_lambda <- laso_model$lambda.min
+best_lambda
+
+
+
+lasso<- glmnet(as.matrix(data_no_missing_columns[-1]),data_no_missing_columns[,1],standarize=TRUE,alpha=1)
+summary(lasso_model)
+AIC(laso_model)
+lasso_model
+X <- as.matrix(data[, -1])
+y <- data[, 1]
+
+# Perform cross-validated Lasso (alpha = 1 corresponds to L1 regularization)
+cv_model <- cv.glmnet(X, y, alpha = 1)
+
+# Print the lambda value that minimizes the mean cross-validated error
+best_lambda <- cv_model$lambda.min
+print(best_lambda)
+
+# AIC value for the best lambda
+best_aic <- cv_model$cvm[cv_model$lambda == best_lambda]
+print(best_aic)
+
+lasso_model <- glmnet(as.matrix(X), y, alpha = 1)
+plot(lasso_model, xvar = "lambda", label = TRUE)
+plot(lasso, xvar = "lambda", label = TRUE)
+
+cv<- cv.glmnet(M[,c(1,3,5)],data_no_missing_columns[,1],standarize=TRUE, type.measure='mse',nfolds=5,alpha=1)
+
+# Extract coefficient names
+coef_names <- colnames(X)
+
+# Identify the lambda values where coefficients become exactly zero
+zero_coef_lambda <- lasso_model$lambda[apply(coef(lasso_model)[-1, , drop = FALSE] != 0, 2, all)]
+
+for (lambda_val in zero_coef_lambda) {
+  coef_values <- coef(lasso_model)[, which(lasso_model$lambda == lambda_val)]
+  text(log(lambda_val), coef_values, coef_names, pos = 1, col = "blue", cex = 0.7)
+}
+
+data #am,wt,cyl,carb,drat-----8,4,5,1,10
+
+cv_model <- cv.glmnet(as.matrix(X), y, alpha = 1)
+cv_model
+best_lambda <- cv_model$lambda.min
+best_lambda
+
+coef_values <- coef(lasso_model)[-1, , drop = FALSE]
+coef_values
+plot(lasso_model, xvar = "lambda", label = TRUE)
+c(data[,1],data[,4],data[,5],data[,8],data[,10])
+
+cv<- cv.glmnet(,data_no_missing_columns[,1],standarize=TRUE, type.measure='mse',nfolds=5,alpha=1)
+
+selected_columns <- data[, c(1, 4, 5, 8, 10)]
+
+# Create a new data frame using the selected columns
+new_data <- as.data.frame(selected_columns)
+
+# Optionally, you can assign meaningful column names to the new data frame
+# Replace "cyl", "drat", etc., with actual column names
+colnames(new_data) <- c("cyl", "drat", "wt", "am", "carb")
+new_data
+
+cv<- cv.glmnet(as.matrix(new_data),data_no_missing_columns[,1],standarize=TRUE, type.measure='mse',nfolds=5,alpha=1)
+cv #cross validation
+
+#rain final model
+best_lambda <- cv$lambda.min  # ή cv$lambda.1se
+final_lasso_model <- glmnet(as.matrix(new_data), data_no_missing_columns[, 1], alpha = 1, lambda = best_lambda)
+predictions <- predict(final_lasso_model, newx = as.matrix(new_data), s = best_lambda)
+mse <- mean((predictions - data_no_missing_columns[, 1])^2)
+predictions
+mse
+
+Mean Squared Error (MSE):
+
+#Το MSE είναι ένα μέτρο που μετρά τη μέση τετραγωνική απόκλιση μεταξύ των
+ #πραγματικών και των προβλεπόμενων τιμών. Σε αυτή την περίπτωση,
+# το MSE είναι περίπου 0.0299, που είναι μικρότερο από τη μονάδα,
+# κάτι που συνήθως είναι καλό, δείχνοντας καλή επίδοση του μοντέλου.
+
+Σειρά Αριθμών (s1):
+
+#Κάθε αριθμός στη σειρά αντιστοιχεί σε μια πρόβλεψη για τον στόχο 
+#(αποκριτική μεταβλητή) για ένα συγκεκριμένο παράδειγμα
+
+#Επεξεργαζόμενοι τη σειρά αριθμών (s1), μπορείτε να δείτε πώς οι προβλεπόμενες
+#τιμές αλλάζουν για κάθε παράδειγμα στα δεδομένα ελέγχου. 
+#Αν οι προβλεπόμενες τιμές είναι κοντά στις πραγματικές, τότε το μοντέλο έχει
+#καλή επίδοση.
+as.matrix(c())
+
+#Σε γενικές γραμμές, μικρότερα MSE υποδεικνύουν καλύτερη επίδοση του μοντέλου
+# σας. Τα αποτελέσματα που παρουσιάζετε φαίνεται να είναι σε λογικά επίπεδα
+# για ένα Mean Squared Error.
+
+comparison <- as.data.frame(c(mpg,predictions))
+comparison
+
+plot(mpg, predictions, main = "Scatter Plot of Actual vs. Predicted", xlab = "Actual Values", ylab = "Predicted Values")
+abline(0, 1, col = "red")
+
+correlation <- cor(mpg, predictions)
+correlation
+
+result <- data.frame(Actual = mpg, Predicted = predictions)
+
+# Print the data frame
+print(result)
+
+
+after_lasso<-lm(mpg~cyl+am+wt+carb)
+summary(after_lasso)
+AIC(after_lasso)
+
+
+> mse
+[1] 0.02990195
+
+
+#The Mean Squared Error (MSE) value of approximately 0.0299 that you've calculated indicates the average squared difference between the predicted values and the actual values
+#of your response variable. In the context of regression models, a lower MSE generally indicates better model performance.
+
+#Interpreting the MSE value:
+
+#The MSE is a measure of the average squared deviation of predictions from the true values.
+#A value of 0 would mean a perfect fit, where predictions exactly match the actual values.
+#Larger values indicate larger errors or discrepancies between predicted and actual values.
+#In your case, an MSE of 0.0299 suggests that, on average, the squared difference between your predicted and actual values is relatively small. However, the
+# interpretation of whether this is a good or bad MSE depends on the scale of your response variable ('mpg'). You may want to compare this value to the range and distribution 
+ #of your 'mpg' values to assess the relative magnitude of the error
+ 
+ 
+confidence_interval <- confint(reduced_model)
+> confidence_interval
+                  2.5 %    97.5 %
+(Intercept) -4.63829946 23.873860
+wt          -5.37333423 -2.459673
+qsec         0.63457320  1.817199
+am           0.04573031  5.825944
+
+
+predict(mod, newdata, interval="predict")
+predict(mod, newdata, interval="confidence")
